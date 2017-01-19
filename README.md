@@ -1,4 +1,4 @@
-# GrapheneJS WebSocket interface (bitsharesjs-ws)
+# Bitshares websocket interface (bitsharesjs-ws)
 
 Pure JavaScript Bitshares websocket library for node.js and browsers. Can be used to easily connect to and obtain data from the Bitshares blockchain via public apis or local nodes.
 
