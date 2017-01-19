@@ -1,0 +1,53 @@
+{
+  "name": "bitsharesjs-ws",
+  "version": "1.0.0",
+  "description": "Pure JavaScript Bitshares/Graphene websocket interface for node.js and browsers.",
+  "browser": {
+    "ws": false
+  },
+  "scripts": {
+    "test": "BABEL_ENV=test mocha --compilers js:babel-core/register --recursive",
+    "test:watch": "npm test -- --watch",
+    "clean": "rm -rf ./cjs/* & rm -rf ./build/* & rm -rf ./es/*",
+    "prebuild": "npm run clean",
+    "build": "BABEL_ENV=cjs babel lib --out-dir cjs",
+    "build-es": "BABEL_ENV=es babel ./lib -d es",
+    "postbuild": "npm run browserify && npm run build-es",
+    "prepublish": "npm run build",
+    "browserify": "NODE_ENV=production browserify cjs/src/ApiInstances.js --standalone bitshares_ws -o build/bitsharesjs-ws.js -d",
+    "postbrowserify": "NODE_ENV=production uglifyjs --compress --mangle --sequences --drop_console --mangle-props --screw-ie8 --output build/bitsharesjs-ws.min.js -- build/bitsharesjs-ws.js",
+    "bundle": "npm run browserify && npm run minify"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bitshares/bitsharesjs-ws.git"
+  },
+  "author": "Sigve Kvalsvik <bitsharesblocks@gmail.com> (https://github.com/svk31)",
+  "contributors": [
+    "James Calfee <james@jcalfee.info> (https://github.com/jcalfee/)"
+  ],
+  "license": "BSD-2-Clause-FreeBSD",
+  "bugs": {
+    "url": "https://github.com/bitshares/bitsharesjs-ws/issues"
+  },
+  "engines": {
+    "node": ">= 6.0.0"
+  },
+  "main": "cjs/index.js",
+  "jsnext:main": "es/index.js",
+  "dependencies": {
+    "ReconnectingWebSocket": "git+https://github.com/bitshares/reconnecting-websocket",
+    "ws": "^1.1.1"
+  },
+  "devDependencies": {
+    "assert": "^1.3.0",
+    "babel-cli": "^6.18.0",
+    "babel-core": "^6.21.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-stage-1": "^6.16.0",
+    "browserify": "^13.0.1",
+    "mocha": "^2.3.4",
+    "uglifyjs": "^2.4.10"
+  }
+}
