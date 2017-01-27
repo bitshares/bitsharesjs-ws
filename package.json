@@ -1,6 +1,6 @@
 {
   "name": "bitsharesjs-ws",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Pure JavaScript Bitshares/Graphene websocket interface for node.js and browsers.",
   "browser": {
     "ws": false
@@ -36,6 +36,9 @@
   "main": "cjs/index.js",
   "jsnext:main": "es/index.js",
   "dependencies": {
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-stage-1": "^6.16.0",
     "ReconnectingWebSocket": "git+https://github.com/bitshares/reconnecting-websocket",
     "ws": "^1.1.1"
   },
@@ -43,9 +46,6 @@
     "assert": "^1.3.0",
     "babel-cli": "^6.18.0",
     "babel-core": "^6.21.0",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-preset-es2015": "^6.18.0",
-    "babel-preset-stage-1": "^6.16.0",
     "browserify": "^13.0.1",
     "mocha": "^2.3.4",
     "uglifyjs": "^2.4.10"
