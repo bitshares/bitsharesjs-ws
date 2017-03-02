@@ -1,6 +1,6 @@
 {
   "name": "bitsharesjs-ws",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Pure JavaScript Bitshares/Graphene websocket interface for node.js and browsers.",
   "browser": {
     "ws": false
@@ -8,6 +8,7 @@
   "scripts": {
     "test": "BABEL_ENV=test mocha --compilers js:babel-core/register --recursive",
     "test:watch": "npm test -- --watch",
+    "test:manager": "BABEL_ENV=test mocha --compilers js:babel-core/register ./test/Manager --watch",
     "clean": "rm -rf ./cjs/* & rm -rf ./build/* & rm -rf ./es/*",
     "prebuild": "npm run clean",
     "build": "BABEL_ENV=cjs babel lib --out-dir cjs",
