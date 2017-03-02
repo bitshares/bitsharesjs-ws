@@ -13,6 +13,17 @@ var faultyNodeList = [
     {url: "wss://testnet.bitshares.eu/ws", location: "Public Testnet Server (Frankfurt, Germany)"}
 ];
 
+var noWorkingNodes = [
+    {url: "wss://bitsqsdqsdhares.openledger.info/ws", location: "Nuremberg, Germany"},
+    {url: "wss://bitazdazdshares.openledger.info/ws", location: "Nuremberg, Germany"},
+    {url: "wss://bitshaazdzares.openledger.info/ws", location: "Nuremberg, Germany"},
+    {url: "wss://bit.btzadazdsabc.org/ws", location: "Hong Kong"},
+    {url: "ws://127.23230.0.1:8091", location: "Hangzhou, China"},
+    {url: "wss://bitshasdares.dacplay.org:8089/ws", location:  "Hangzhou, China"},
+    {url: "wss://secuasdre.freedomledger.com/ws", location: "Toronto, Canada"},
+    {url: "wss://testnet.bitshares.eu/wqsdsqs", location: "Public Testnet Server (Frankfurt, Germany)"}
+];
+
 var goodNodeList = [
     {url: "wss://bitshares.openledger.info/ws", location: "Nuremberg, Germany"},
     {url: "wss://bit.btsabc.org/ws", location: "Hong Kong"},
@@ -23,7 +34,7 @@ var goodNodeList = [
     {url: "wss://testnet.bitshares.eu/ws", location: "Public Testnet Server (Frankfurt, Germany)"}
 ];
 
-describe("Manager", function() {
+describe("Connection Manager", function() {
 
     it("Instantiates", function() {
         let man = new Manager({url: defaultUrl, urls: faultyNodeList.map(a => a.url)});
@@ -45,6 +56,15 @@ describe("Manager", function() {
         return new Promise( function(resolve, reject) {
             man.connectWithFallback().then(resolve)
             .catch(reject)
+        });
+    });
+
+    it("Rejects if no connections are successful ", function() {
+        this.timeout(15000);
+        let man = new Manager({url: "ws://127.0.0.1:8092", urls: noWorkingNodes.map(a => a.url)});
+        return new Promise( function(resolve, reject) {
+            man.connectWithFallback().then(reject)
+            .catch(resolve);
         });
     });
 
