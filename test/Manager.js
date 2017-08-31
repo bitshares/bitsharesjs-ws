@@ -2,6 +2,7 @@ import assert from "assert";
 import { Manager } from "../lib";
 
 var defaultUrl = "wss://bitshares.openledger.info/ws";
+defaultUrl = "wss://dexnode.net/ws";
 var faultyNodeList = [
     {url: "wss://bitsqsdqsdhares.openledger.info/ws", location: "Nuremberg, Germany"},
     {url: "wss://bitazdazdshares.openledger.info/ws", location: "Nuremberg, Germany"},
@@ -88,7 +89,7 @@ describe("Connection Manager", function() {
         this.timeout(3000);
         let man = new Manager({url: failedInitNodes[0].url, urls: []});
         return new Promise(function(resolve, reject) {
-            man.connect().then(function(res) {
+            man.connect(undefined, undefined, true).then(function(res) {
                 reject();
             }).catch(function(err) {
                 resolve();
