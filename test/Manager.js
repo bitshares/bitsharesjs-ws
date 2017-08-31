@@ -1,7 +1,7 @@
 import assert from "assert";
 import { Manager } from "../lib";
 
-var defaultUrl = "ws://127.0.0.1:8090";
+var defaultUrl = "wss://bitshares.openledger.info/ws";
 var faultyNodeList = [
     {url: "wss://bitsqsdqsdhares.openledger.info/ws", location: "Nuremberg, Germany"},
     {url: "wss://bitazdazdshares.openledger.info/ws", location: "Nuremberg, Germany"},
@@ -34,6 +34,11 @@ var goodNodeList = [
     {url: "wss://testnet.bitshares.eu/ws", location: "Public Testnet Server (Frankfurt, Germany)"}
 ];
 
+/* This node currently throws an API error for the crypto API */
+var failedInitNodes = [
+    {url: "wss://bitshares.crypto.fans/ws", location: "Munich"}
+];
+
 describe("Connection Manager", function() {
 
     it("Instantiates", function() {
@@ -50,11 +55,14 @@ describe("Connection Manager", function() {
         });
     });
 
-    it("Tries to connect to fallback", function() {
+    it("Tries to connect to fallback and updates current url on connection success", function() {
         this.timeout(15000);
         let man = new Manager({url: "ws://127.0.0.1:8092", urls: faultyNodeList.map(a => a.url)});
         return new Promise( function(resolve, reject) {
-            man.connectWithFallback().then(resolve)
+            man.connectWithFallback().then(function() {
+                assert.equal(man.url, "wss://bitshares.dacplay.org:8089/ws");
+                resolve();
+            })
             .catch(reject)
         });
     });
@@ -74,6 +82,18 @@ describe("Connection Manager", function() {
         return new Promise( function(resolve, reject) {
             man.checkConnections().then(resolve).catch(reject);
         });
-    })
+    });
+
+    it("Throws an error if an API fails to initialize", function() {
+        this.timeout(3000);
+        let man = new Manager({url: failedInitNodes[0].url, urls: []});
+        return new Promise(function(resolve, reject) {
+            man.connect().then(function(res) {
+                reject();
+            }).catch(function(err) {
+                resolve();
+            });
+        });
+    });
 
 });
