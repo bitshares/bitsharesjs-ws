@@ -17,6 +17,8 @@ npm install bitsharesjs-ws
 
 ## Usage
 
+Several examples are available in the /examples folder, and the tests in /test also show how to use the library.
+
 Browser bundles are provided in /build/, for testing purposes you can access this from rawgit:
 
 ```
@@ -29,7 +31,7 @@ For use in a webpack/browserify context, see the example below for how to open a
 
 ```
 var {Apis} = require("bitsharesjs-ws");
-Apis.instance("wss://bitshares.openledger.info/ws").init_promise.then((res) => {
+Apis.instance("wss://bitshares.openledger.info/ws", true).init_promise.then((res) => {
     console.log("connected to:", res[0].network);
     Apis.instance().db_api().exec( "set_subscribe_callback", [ updateListener, true ] )
 });
