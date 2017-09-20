@@ -35,12 +35,12 @@ describe("Connection", () => {
     });
 
     it("Connect to Testnet", function() {
-        return new Promise( function(resolve) {
-            Apis.instance("wss://testnet.bitshares.eu/ws", true).init_promise.then(function (result) {
+        return new Promise( function(resolve, reject) {
+            Apis.instance("wss://node.testnet.bitshares.eu", true).init_promise.then(function (result) {
                 coreAsset = result[0].network.core_asset;
                 assert(coreAsset === "TEST");
                 resolve();
-            });
+            }).catch(reject)
         });
     });
 });
