@@ -1,6 +1,6 @@
 {
   "name": "bitsharesjs-ws",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Pure JavaScript Bitshares/Graphene websocket interface for node.js and browsers.",
   "browser": {
     "ws": false
