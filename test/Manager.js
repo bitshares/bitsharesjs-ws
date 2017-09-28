@@ -9,7 +9,7 @@ var faultyNodeList = [
     {url: "wss://bitshaazdzares.openledger.info/ws", location: "Nuremberg, Germany"},
     {url: "wss://bit.btzadazdsabc.org/ws", location: "Hong Kong"},
     {url: "ws://127.0.0.1:8091", location: "Hangzhou, China"},
-    {url: "wss://bitshares.dacplay.org:8089/ws", location:  "Hangzhou, China"},
+    {url: "wss://bitshares.openledger.info/ws", location: "Nuremberg, Germany"},
     {url: "wss://secure.freedomledger.com/ws", location: "Toronto, Canada"},
     {url: "wss://node.testnet.bitshares.eu", location: "Public Testnet Server (Frankfurt, Germany)"}
 ];
@@ -42,6 +42,10 @@ var failedInitNodes = [
 
 describe("Connection Manager", function() {
 
+    // beforeEach(function() {
+    //     return Manager.close();
+    // });
+
     it("Instantiates", function() {
         let man = new Manager({url: defaultUrl, urls: faultyNodeList.map(a => a.url)});
         assert.equal(man.url, defaultUrl);
@@ -61,7 +65,7 @@ describe("Connection Manager", function() {
         let man = new Manager({url: "ws://127.0.0.1:8092", urls: faultyNodeList.map(a => a.url)});
         return new Promise( function(resolve, reject) {
             man.connectWithFallback().then(function() {
-                assert.equal(man.url, "wss://bitshares.dacplay.org:8089/ws");
+                assert.equal(man.url, "wss://bitshares.openledger.info/ws");
                 resolve();
             })
             .catch(reject)

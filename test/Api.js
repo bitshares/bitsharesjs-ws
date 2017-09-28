@@ -6,7 +6,7 @@ var coreAsset;
 describe("Connection", () => {
 
     afterEach(function() {
-        Apis.close();
+        return Apis.close();
     });
 
     // it("Connect to localhost", function() {
@@ -45,6 +45,27 @@ describe("Connection", () => {
     });
 });
 
+describe("Connection reset", () => {
+    it("Resets between chains", function() {
+        return new Promise( function(resolve, reject) {
+            Apis.instance("wss://bitshares.openledger.info/ws", true).init_promise.then(function (result) {
+                coreAsset = result[0].network.core_asset;
+                assert(coreAsset === "BTS");
+                Apis.reset("wss://node.testnet.bitshares.eu", true).then(instance => {
+                    instance.init_promise.then(function (result) {
+                        coreAsset = result[0].network.core_asset;
+                        assert(coreAsset === "TEST");
+                        resolve();
+                    }).catch(reject)
+                })
+
+            });
+        });
+    });
+
+
+});
+
 describe("Api", () => {
 
     let cs = "wss://bitshares.openledger.info/ws";
@@ -63,7 +84,7 @@ describe("Api", () => {
         });
 
         afterEach(function() {
-            Apis.close();
+            return Apis.close();
         });
 
         it("Set subscribe callback", function() {
