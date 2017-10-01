@@ -83,7 +83,10 @@ describe("Connection Manager", function() {
 
     it("Can check connection times for all connections", function() {
         this.timeout(20000);
-        let man = new Manager({url: "ws://127.0.0.1:8090", urls: goodNodeList.map(a => a.url)});
+        let man = new Manager({url: "ws://127.0.0.1:8090", urls: goodNodeList.map(a => a.url).concat([
+            "wss://bit.btsabc.org/ws",
+            "wss://secure.freedomledger.com/ws"
+        ])});
         return new Promise( function(resolve, reject) {
             man.checkConnections().then(resolve).catch(reject);
         });
