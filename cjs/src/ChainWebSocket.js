@@ -55,7 +55,7 @@ var ChainWebSocket = function () {
         _this.keepalive_timer = setInterval(function () {
           _this.recv_life--;
           if (_this.recv_life == 0) {
-            console.error("keep alive timeout.");
+            // console.error("keep alive timeout.");
             if (_this.ws.terminate) {
               _this.ws.terminate();
             } else {
