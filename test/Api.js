@@ -44,6 +44,18 @@ describe("Connection", () => {
             }).catch(reject)
         });
     });
+
+    it("Times out properly", function() {
+        return new Promise( function(resolve, reject) {
+            /* 1ms connection timeout */
+            Apis.instance(default_api, true, 1).init_promise.then(function() {
+                reject();
+            }).catch(function(err) {
+                assert(err.message.search("Connection attempt timed out") !== -1);
+                resolve();
+            })
+        });
+    });
 });
 
 describe("Connection reset", () => {
