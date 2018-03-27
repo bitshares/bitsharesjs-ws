@@ -1,8 +1,8 @@
 import assert from "assert";
 import { Manager } from "../lib";
 
-var defaultUrl = "wss://bitshares.openledger.info/ws";
-defaultUrl = "wss://dexnode.net/ws";
+var defaultUrl = "wss://eu.nodes.bitshares.ws";
+
 var faultyNodeList = [
     {url: "wss://bitsqsdqsdhares.openledger.info/ws", location: "Nuremberg, Germany"},
     {url: "wss://bitazdazdshares.openledger.info/ws", location: "Nuremberg, Germany"},
