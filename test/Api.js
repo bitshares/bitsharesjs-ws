@@ -56,6 +56,18 @@ describe("Connection", () => {
             })
         });
     });
+
+    it("Can be closed", function() {
+        return new Promise( function(resolve, reject) {
+            Apis.instance(default_api, true).init_promise.then(function (result) {
+                coreAsset = result[0].network.core_asset;
+                assert(coreAsset === "BTS");
+                Apis.instance().close().then(function() {
+                    resolve();
+                }).catch(reject)
+            })
+        });
+    });
 });
 
 describe("Connection reset", () => {

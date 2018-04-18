@@ -1,5 +1,5 @@
 import assert from "assert";
-import { Manager } from "../lib";
+import { Manager, Apis } from "../lib";
 
 var defaultUrl = "wss://eu.nodes.bitshares.ws";
 
@@ -42,9 +42,11 @@ var failedInitNodes = [
 
 describe("Connection Manager", function() {
 
-    // beforeEach(function() {
-    //     return Manager.close();
-    // });
+    afterEach(function() {
+        return new Promise(function(res) {
+            Manager.close().then(res);
+        })
+    });
 
     it("Instantiates", function() {
         let man = new Manager({url: defaultUrl, urls: faultyNodeList.map(a => a.url)});
@@ -91,6 +93,55 @@ describe("Connection Manager", function() {
             man.checkConnections().then(resolve).catch(reject);
         });
     });
+
+    it("Can automatically fallback when closed", function() {
+        this.timeout(20000);
+        let man = new Manager({
+            url: "wss://eu.nodes.bitshares.ws",
+            urls: ([
+                "wss://eu.nodes.bitshares.ws",
+                "wss://bitshares.openledger.info/ws"
+            ]),
+            autoFallback: true
+        });
+
+        return new Promise( function(resolve, reject) {
+            man.connectWithFallback().then(function() {
+                // Assign faulty url to simulate faulty connection
+                man.url = faultyNodeList[0].url;
+                Apis.instance().ws_rpc.ws.close();
+                setTimeout(function() {
+                    if (man.isConnected) {
+                        resolve();
+                        /* Set autoFallback to false here to prevent permanent reconnections*/
+                        man.autoFallback = false;
+                    }
+                    else reject();
+                }, 2000);
+            });
+        });
+    });
+
+    it("Can call a fallbackCb when closed", function() {
+        this.timeout(20000);
+        return new Promise( function(resolve, reject) {
+
+        let man = new Manager({
+            url: "wss://eu.nodes.bitshares.ws",
+            urls: ([
+                "wss://eu.nodes.bitshares.ws",
+                "wss://eu.openledger.info/ws"
+            ]),
+            closeCb: function() {
+                resolve();
+            }
+        });
+
+            man.connectWithFallback().then(function() {
+                Apis.instance().ws_rpc.ws.close();
+            });
+        });
+    })
 
     // it("Throws an error if an API fails to initialize", function() {
     //     this.timeout(5000);
