@@ -3,7 +3,6 @@ import {Apis} from "../lib";
 
 var coreAsset;
 var default_api = "wss://bitshares.openledger.info/ws";
-default_api = "wss://bts.to0l.cn:4443/ws";
 
 describe("Connection", () => {
 
