@@ -215,7 +215,17 @@ describe("Connection Manager", function() {
         let man = new Manager({url: "ws://127.0.0.1:8090", urls: fullNodeList.map(a => a.url)});
         return new Promise( function(resolve, reject) {
             man.checkConnections().then((latencies => {
-                console.log("Latencies:", latencies);
+                resolve();
+            })).catch(reject);
+        });
+    });
+
+    it("Checks connections for url and urls", function() {
+        this.timeout(20000);
+        let man = new Manager({url: "wss://eu.nodes.bitshares.ws", urls: ["wss://bts.open.icowallet.net/ws"]});
+        return new Promise( function(resolve, reject) {
+            man.checkConnections().then((latencies => {
+                assert.equal(Object.keys(latencies).length, 2);
                 resolve();
             })).catch(reject);
         });
