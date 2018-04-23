@@ -2,89 +2,23 @@ import assert from "assert";
 import {Apis} from "../lib";
 
 var coreAsset;
-
-describe("Connection", () => {
-
-    afterEach(function() {
-        return Apis.close();
-    });
-
-    // it("Connect to localhost", function() {
-    //     return new Promise( function(resolve) {
-    //         Apis.instance("ws://localhost:8090").init_promise.then(function (result) {
-    //             coreAsset = result[0].network.core_asset;
-    //
-    //             if (typeof coreAsset === "string") {
-    //                 resolve();
-    //             } else {
-    //                 reject(new Error("Expected coreAsset to be a string"));
-    //             }
-    //         });
-    //     });
-    // });
-
-
-    it("Connect to Openledger", function() {
-        return new Promise( function(resolve) {
-            Apis.instance("wss://bitshares.openledger.info/ws", true).init_promise.then(function (result) {
-                coreAsset = result[0].network.core_asset;
-                assert(coreAsset === "BTS");
-                resolve();
-            });
-        });
-    });
-
-    it("Connect to Testnet", function() {
-        return new Promise( function(resolve, reject) {
-            Apis.instance("wss://node.testnet.bitshares.eu", true).init_promise.then(function (result) {
-                coreAsset = result[0].network.core_asset;
-                assert(coreAsset === "TEST");
-                resolve();
-            }).catch(reject)
-        });
-    });
-});
-
-describe("Connection reset", () => {
-    it("Resets between chains", function() {
-        return new Promise( function(resolve, reject) {
-            Apis.instance("wss://bitshares.openledger.info/ws", true).init_promise.then(function (result) {
-                coreAsset = result[0].network.core_asset;
-                assert(coreAsset === "BTS");
-                Apis.reset("wss://node.testnet.bitshares.eu", true).then(instance => {
-                    instance.init_promise.then(function (result) {
-                        coreAsset = result[0].network.core_asset;
-                        assert(coreAsset === "TEST");
-                        resolve();
-                    }).catch(reject)
-                })
-
-            });
-        });
-    });
-
-
-});
+var default_api = "wss://bitshares.crypto.fans/ws";
 
 describe("Api", () => {
 
-    let cs = "wss://bitshares.openledger.info/ws";
-
-
-    // after(function() {
-    //     ChainConfig.reset();
-    // });
+    let cs = default_api;
 
     describe("Subscriptions", function() {
-
         beforeEach(function() {
             return Apis.instance(cs, true).init_promise.then(function (result) {
                 coreAsset = result[0].network.core_asset;
-            });
+            }).catch( ()=>{});
         });
 
         afterEach(function() {
-            return Apis.close();
+            return new Promise(function(res) {
+                Apis.close().then(res);
+            })
         });
 
         it("Set subscribe callback", function() {
@@ -154,6 +88,12 @@ describe("Api", () => {
             return Apis.instance(cs, true).init_promise.then(function (result) {
                 coreAsset = result[0].network.core_asset;
             });
+        });
+
+        after(function() {
+            return new Promise(function(res) {
+                Apis.close().then(res);
+            })
         });
 
         it("Get object", function() {
@@ -249,43 +189,5 @@ describe("Api", () => {
                 })
             })
         });
-
-
-
-
     });
-        /*
-
-
-        it("Asset by id", function() {
-            return new Promise( function(resolve) {
-                ChainStore.subscribe(function() {
-                    assert(ChainStore.getAsset("1.3.0") != null)
-                    resolve()
-                })
-                assert(ChainStore.getAsset("1.3.0") === undefined)
-            })
-        })
-
-        it("Object by id", function() {
-            return new Promise( function(resolve) {
-                ChainStore.subscribe(function() {
-                    assert(ChainStore.getAsset("2.0.0") != null)
-                    resolve()
-                })
-                assert(ChainStore.getAsset("2.0.0") === undefined)
-            })
-        })
-
-        */
-
-        //     ChainStore.getAccount("not found")
-        //
-        //     ChainStore.unsubscribe(cb)
-        //     // return FetchChain("getAccount", "notfound")
-        //     let cb = res => console.log('res',res)
-        //     // })
-        // })
-
-
 })
