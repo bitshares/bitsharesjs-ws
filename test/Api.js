@@ -189,5 +189,32 @@ describe("Api", () => {
                 })
             })
         });
+
+        it ("Get tracked groups config", function() {
+            return new Promise( function(resolve, reject) {
+                Apis.instance().orders_api().exec("get_tracked_groups", [])
+                .then(function(trackedGroups) {
+                    if (trackedGroups.length > 0) {
+                        resolve();
+                    } else {
+                        reject(new Error("Get tracked groups error"));
+                    }
+                })
+            })
+        });
+
+        it ("Get ordered groups", function() {
+            return new Promise( function(resolve, reject) {
+                Apis.instance().orders_api().exec("get_grouped_limit_orders", ["1.3.113","1.3.0",10,null,1])
+                .then(function(groups) {
+                    if (groups.length > 0) {
+                        resolve();
+                    } else {
+                        reject(new Error("Get groups error"));
+                    }
+                })
+            })
+        });
+        
     });
 })
