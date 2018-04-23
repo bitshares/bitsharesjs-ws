@@ -2,7 +2,7 @@ import assert from "assert";
 import {Apis} from "../lib";
 
 var coreAsset;
-var default_api = "wss://bitshares.crypto.fans/ws";
+var default_api = "wss://eu.nodes.bitshares.ws";
 
 describe("Api", () => {
 
@@ -207,6 +207,21 @@ describe("Api", () => {
 
     });
 
+    describe("Crypto API", function() {
+
+        // Connect once for all tests
+        before(function() {
+            return Apis.instance(cs, true, 5000, {enableCrypto: true}).init_promise.then(function (result) {
+                coreAsset = result[0].network.core_asset;
+            });
+        });
+
+        it("Initializes the crypto api", function() {
+            assert(!!Apis.instance().crypto_api());
+        })
+
+    });
+
     describe("Orders API", function() {
 
         // Connect once for all tests
@@ -222,6 +237,10 @@ describe("Api", () => {
             })
         });
 
+        it("Initializes the orders api", function() {
+            assert(!!Apis.instance().orders_api());
+        })
+
         it ("Get tracked groups config", function() {
             return new Promise( function(resolve, reject) {
                 Apis.instance().orders_api().exec("get_tracked_groups", [])
@@ -231,6 +250,8 @@ describe("Api", () => {
                     } else {
                         reject(new Error("Get tracked groups error"));
                     }
+                }).catch(err => {
+                    reject(err);
                 })
             })
         });
@@ -244,6 +265,8 @@ describe("Api", () => {
                     } else {
                         reject(new Error("Get groups error"));
                     }
+                }).catch(err => {
+                    reject(err);
                 })
             })
         });
