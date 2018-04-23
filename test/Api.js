@@ -2,106 +2,13 @@ import assert from "assert";
 import {Apis} from "../lib";
 
 var coreAsset;
-var default_api = "wss://bitshares.openledger.info/ws";
-
-describe("Connection", () => {
-
-    afterEach(function() {
-        return Apis.close();
-    });
-
-    // it("Connect to localhost", function() {
-    //     return new Promise( function(resolve) {
-    //         Apis.instance("ws://localhost:8090").init_promise.then(function (result) {
-    //             coreAsset = result[0].network.core_asset;
-    //
-    //             if (typeof coreAsset === "string") {
-    //                 resolve();
-    //             } else {
-    //                 reject(new Error("Expected coreAsset to be a string"));
-    //             }
-    //         });
-    //     });
-    // });
-
-
-    it("Connect to Openledger", function() {
-        return new Promise( function(resolve, reject) {
-            Apis.instance(default_api, true).init_promise.then(function (result) {
-                coreAsset = result[0].network.core_asset;
-                assert(coreAsset === "BTS");
-                resolve();
-            }).catch(reject)
-        });
-    });
-
-    it("Connect to Testnet", function() {
-        return new Promise( function(resolve, reject) {
-            Apis.instance("wss://node.testnet.bitshares.eu", true).init_promise.then(function (result) {
-                coreAsset = result[0].network.core_asset;
-                assert(coreAsset === "TEST");
-                resolve();
-            }).catch(reject)
-        });
-    });
-
-    it("Times out properly", function() {
-        return new Promise( function(resolve, reject) {
-            /* 1ms connection timeout */
-            Apis.instance(default_api, true, 1).init_promise.then(function() {
-                reject();
-            }).catch(function(err) {
-                assert(err.message.search("Connection attempt timed out") !== -1);
-                resolve();
-            })
-        });
-    });
-
-    it("Can be closed", function() {
-        return new Promise( function(resolve, reject) {
-            Apis.instance(default_api, true).init_promise.then(function (result) {
-                coreAsset = result[0].network.core_asset;
-                assert(coreAsset === "BTS");
-                Apis.instance().close().then(function() {
-                    resolve();
-                }).catch(reject)
-            })
-        });
-    });
-});
-
-describe("Connection reset", () => {
-    it("Resets between chains", function() {
-        return new Promise( function(resolve, reject) {
-            Apis.instance(default_api, true).init_promise.then(function (result) {
-                coreAsset = result[0].network.core_asset;
-                assert(coreAsset === "BTS");
-                Apis.reset("wss://node.testnet.bitshares.eu", true).then(instance => {
-                    instance.init_promise.then(function (result) {
-                        coreAsset = result[0].network.core_asset;
-                        assert(coreAsset === "TEST");
-                        resolve();
-                    }).catch(reject)
-                })
-
-            });
-        });
-    });
-
-
-});
+var default_api = "wss://bitshares.crypto.fans/ws";
 
 describe("Api", () => {
 
     let cs = default_api;
 
-
-    // after(function() {
-    //     ChainConfig.reset();
-    // });
-
     describe("Subscriptions", function() {
-
         beforeEach(function() {
             return Apis.instance(cs, true).init_promise.then(function (result) {
                 coreAsset = result[0].network.core_asset;
@@ -109,7 +16,9 @@ describe("Api", () => {
         });
 
         afterEach(function() {
-            return Apis.close();
+            return new Promise(function(res) {
+                Apis.close().then(res);
+            })
         });
 
         it("Set subscribe callback", function() {
@@ -179,6 +88,12 @@ describe("Api", () => {
             return Apis.instance(cs, true).init_promise.then(function (result) {
                 coreAsset = result[0].network.core_asset;
             });
+        });
+
+        after(function() {
+            return new Promise(function(res) {
+                Apis.close().then(res);
+            })
         });
 
         it("Get object", function() {
@@ -301,40 +216,5 @@ describe("Api", () => {
             })
         });
         
-
     });
-        /*
-
-
-        it("Asset by id", function() {
-            return new Promise( function(resolve) {
-                ChainStore.subscribe(function() {
-                    assert(ChainStore.getAsset("1.3.0") != null)
-                    resolve()
-                })
-                assert(ChainStore.getAsset("1.3.0") === undefined)
-            })
-        })
-
-        it("Object by id", function() {
-            return new Promise( function(resolve) {
-                ChainStore.subscribe(function() {
-                    assert(ChainStore.getAsset("2.0.0") != null)
-                    resolve()
-                })
-                assert(ChainStore.getAsset("2.0.0") === undefined)
-            })
-        })
-
-        */
-
-        //     ChainStore.getAccount("not found")
-        //
-        //     ChainStore.unsubscribe(cb)
-        //     // return FetchChain("getAccount", "notfound")
-        //     let cb = res => console.log('res',res)
-        //     // })
-        // })
-
-
 })
