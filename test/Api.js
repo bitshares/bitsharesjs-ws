@@ -2,7 +2,7 @@ import assert from "assert";
 import {Apis} from "../lib";
 
 var coreAsset;
-var default_api = "wss://bitshares.crypto.fans/ws";
+var default_api = "wss://eu.openledger.info/ws";
 
 describe("Api", () => {
 
@@ -81,7 +81,7 @@ describe("Api", () => {
         })
     })
 
-    describe("Api methods", function() {
+    describe("Database API", function() {
 
         // Connect once for all tests
         before(function() {
@@ -173,6 +173,21 @@ describe("Api", () => {
             })
         });
 
+    });
+
+    describe("History API", function() {
+        // Connect once for all tests
+        before(function() {
+            return Apis.instance(cs, true).init_promise.then(function (result) {
+                coreAsset = result[0].network.core_asset;
+            });
+        });
+
+        after(function() {
+            return new Promise(function(res) {
+                Apis.close().then(res);
+            })
+        });
 
         it ("Get market data", function() {
             return new Promise( function(resolve, reject) {
@@ -189,5 +204,73 @@ describe("Api", () => {
                 })
             })
         });
+
+    });
+
+    describe("Crypto API", function() {
+
+        // Connect once for all tests
+        before(function() {
+            return Apis.instance(cs, true, 5000, {enableCrypto: true}).init_promise.then(function (result) {
+                coreAsset = result[0].network.core_asset;
+            });
+        });
+
+        it("Initializes the crypto api", function() {
+            assert(!!Apis.instance().crypto_api());
+        })
+
+    });
+
+    describe("Orders API", function() {
+
+        // Connect once for all tests
+        before(function() {
+            return Apis.instance(cs, true, 5000, {enableOrders: true}).init_promise.then(function (result) {
+                coreAsset = result[0].network.core_asset;
+            });
+        });
+
+        after(function() {
+            return new Promise(function(res) {
+                Apis.close().then(res);
+            })
+        });
+
+        it("Initializes the orders api", function() {
+            assert(!!Apis.instance().orders_api());
+        })
+
+        it ("Get tracked groups config", function() {
+            return new Promise( function(resolve, reject) {
+                Apis.instance().orders_api().exec("get_tracked_groups", [])
+                .then(function(trackedGroups) {
+                    if (trackedGroups.length > 0) {
+                        resolve();
+                    } else {
+                        reject(new Error("Get tracked groups error"));
+                    }
+                }).catch(err => {
+                    reject(err);
+                })
+            })
+        });
+
+        it ("Get ordered groups", function() {
+            return new Promise( function(resolve, reject) {
+                Apis.instance().orders_api().exec("get_grouped_limit_orders", ["1.3.113","1.3.0",10,null,1])
+                .then(function(groups) {
+                    if (groups.length > 0) {
+                        resolve();
+                    } else {
+                        reject(new Error("Get groups error"));
+                    }
+                }).catch(err => {
+                    reject(err);
+                })
+            })
+        });
+
+
     });
 })
