@@ -2,7 +2,7 @@ import assert from "assert";
 import {Apis} from "../lib";
 
 var coreAsset;
-var default_api = "wss://eu.nodes.bitshares.ws";
+var default_api = "wss://eu.openledger.info/ws";
 
 describe("Api", () => {
 
@@ -260,6 +260,7 @@ describe("Api", () => {
             return new Promise( function(resolve, reject) {
                 Apis.instance().orders_api().exec("get_grouped_limit_orders", ["1.3.113","1.3.0",10,null,1])
                 .then(function(groups) {
+                    console.log("groups:", groups)
                     if (groups.length > 0) {
                         resolve();
                     } else {
