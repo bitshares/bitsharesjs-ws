@@ -216,6 +216,12 @@ describe("Api", () => {
             });
         });
 
+        after(function() {
+            return new Promise(function(res) {
+                Apis.close().then(res);
+            })
+        });
+
         it("Initializes the crypto api", function() {
             assert(!!Apis.instance().crypto_api());
         })
