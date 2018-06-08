@@ -172,6 +172,23 @@ describe("Connection Manager", function() {
         });
     });
 
+    it("Tries to connect to fallback and can call a callback when falling back to new url", function() {
+        this.timeout(15000);
+        let url = "ws://127.0.0.1:8092";
+        let callbackCalled = false;
+        let urlChangeCallback = function(newUrl) {
+            callbackCalled = !!newUrl;
+        }
+        let man = new Manager({url , urls: faultyNodeList.map(a => a.url), urlChangeCallback});
+        return new Promise( function(resolve, reject) {
+            man.connectWithFallback().then(function() {
+                assert(callbackCalled);
+                resolve();
+            })
+            .catch(reject)
+        });
+    });
+
     it("Rejects if no connections are successful ", function() {
         this.timeout(15000);
         let man = new Manager({url: "ws://127.0.0.1:8092", urls: noWorkingNodes.map(a => a.url)});
