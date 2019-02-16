@@ -1,4 +1,6 @@
-lib
+src
 test
 examples
 build
+browser-test
+tools
