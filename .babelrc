@@ -1,11 +1,14 @@
 {
-    "presets": [
-        ["./tools/es2015Preset"],
-        "stage-1"
-    ],
-    "env": {
-        "cjs": {
-            "plugins": ["add-module-exports"]
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "browsers": "> 1%",
+          "node": "10"
         }
-    }
+      }
+    ]
+  ],
+  "plugins": ["@babel/plugin-proposal-class-properties"]
 }
