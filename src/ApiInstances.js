@@ -1,229 +1,180 @@
-// var { List } = require("immutable");
 import ChainWebSocket from "./ChainWebSocket";
 import GrapheneApi from "./GrapheneApi";
 import ChainConfig from "./ChainConfig";
 
-if (global) { global.inst = ""; } else { let inst; };
 let autoReconnect = false; // by default don't use reconnecting-websocket
-/**
-    Configure: configure as follows `Apis.instance("ws://localhost:8090").init_promise`.  This returns a promise, once resolved the connection is ready.
 
-    Import: import { Apis } from "@graphene/chain"
+var Apis = null;
+var statusCb = null;
 
-    Short-hand: Apis.db.method("parm1", 2, 3, ...).  Returns a promise with results.
+export const setRpcConnectionStatusCallback = callback => {
+  statusCb = callback;
+  if (Apis) Apis.setRpcConnectionStatusCallback(callback);
+};
 
-    Additional usage: Apis.instance().db_api().exec("method", ["method", "parm1", 2, 3, ...]).  Returns a promise with results.
-*/
-class Apis {
-    static setRpcConnectionStatusCallback(callback) {
-        this.statusCb = callback;
-        if(inst) inst.setRpcConnectionStatusCallback(callback);
+export const setAutoReconnect = auto => {
+  autoReconnect = auto;
+};
+
+export const reset = (
+  cs = "ws://localhost:8090",
+  connect,
+  connectTimeout = 4000,
+  optionalApis,
+  closeCb
+) => {
+  return close().then(() => {
+    Apis = newApis();
+    Apis.setRpcConnectionStatusCallback(statusCb);
+
+    if (Apis && connect)
+      Apis.connect(cs, connectTimeout, optionalApis, closeCb);
+
+    return Apis;
+  });
+};
+
+export const instance = (
+  cs = "ws://localhost:8090",
+  connect,
+  connectTimeout = 4000,
+  optionalApis,
+  closeCb
+) => {
+  if (!Apis) {
+    Apis = newApis();
+    Apis.setRpcConnectionStatusCallback(statusCb);
+  }
+
+  if (Apis && connect) {
+    Apis.connect(cs, connectTimeout, optionalApis);
+  }
+  if (closeCb) Apis.closeCb = closeCb;
+  return Apis;
+};
+
+export const chainId = () => {
+  return instance().chain_id;
+};
+
+export const close = async () => {
+  if (Apis) {
+    await Apis.close();
+    Apis = null;
+  }
+};
+
+const get = name =>
+  new Proxy([], {
+    get: (_, method) => (...args) => Apis[name].exec(method, [...args])
+  });
+
+export const db = get("_db");
+export const network = get("_net");
+export const history = get("_hist");
+export const crypto = get("_crypt");
+export const orders = get("_orders");
+
+const newApis = () => ({
+  connect: (
+    cs,
+    connectTimeout,
+    optionalApis = { enableCrypto: false, enableOrders: false }
+  ) => {
+    // console.log("INFO\tApiInstances\tconnect\t", cs);
+    Apis.url = cs;
+    let rpc_user = "",
+      rpc_password = "";
+    if (
+      typeof window !== "undefined" &&
+      window.location &&
+      window.location.protocol === "https:" &&
+      cs.indexOf("wss://") < 0
+    ) {
+      throw new Error("Secure domains require wss connection");
     }
 
-    /**
-        @arg {boolean} auto means automatic reconnect if possible( browser case), default true
-    */
-    static setAutoReconnect( auto ) {
-        autoReconnect = auto;
+    if (Apis.ws_rpc) {
+      Apis.ws_rpc.statusCb = null;
+      Apis.ws_rpc.keepAliveCb = null;
+      Apis.ws_rpc.on_close = null;
+      Apis.ws_rpc.on_reconnect = null;
     }
-
-    /**
-        @arg {string} cs is only provided in the first call
-        @return {Apis} singleton .. Check Apis.instance().init_promise to know when the connection is established
-    */
-    static reset( cs = "ws://localhost:8090", connect, connectTimeout = 4000, optionalApis, closeCb ) {
-        return this.close().then(() => {
-            inst = new Apis();
-            inst.setRpcConnectionStatusCallback(this.statusCb);
-
-            if (inst && connect) {
-                inst.connect(cs, connectTimeout, optionalApis, closeCb);
-            }
-
-            return inst;
-        })
-
-    }
-    static instance( cs = "ws://localhost:8090", connect, connectTimeout = 4000, optionalApis, closeCb) {
-        if ( ! inst ) {
-            inst = new Apis();
-            inst.setRpcConnectionStatusCallback(this.statusCb);
+    Apis.ws_rpc = new ChainWebSocket(
+      cs,
+      Apis.statusCb,
+      connectTimeout,
+      autoReconnect,
+      closed => {
+        if (Apis._db && !closed) {
+          Apis._db.exec("get_objects", [["2.1.0"]]).catch(e => {});
         }
+      }
+    );
 
-        if (inst && connect) {
-            inst.connect(cs, connectTimeout, optionalApis);
-        }
-        if (closeCb) inst.closeCb = closeCb;
-        return inst;
-    }
-    static chainId() { return this.instance().chain_id}
-
-    static close() {
-        if (inst) {
-            return new Promise((res) => {
-                inst.close().then(() => {
-                    inst = null;
-                    res();
-                });
-            });
-        }
-
-        return Promise.resolve();
-    }
-    // db: (method, ...args) => Apis.instance().db_api().exec(method, toStrings(args)),
-    // network: (method, ...args) => Apis.instance().network_api().exec(method, toStrings(args)),
-    // history: (method, ...args) => Apis.instance().history_api().exec(method, toStrings(args)),
-    // crypto: (method, ...args) => Apis.instance().crypto_api().exec(method, toStrings(args))
-    // orders: (method, ...args) => Apis.instance().orders_api().exec(method, toStrings(args))
-    static db = new Proxy(Apis, {
-        get(apis, method) {
-            return function() {
-                return apis.instance().db_api().exec(method,[...arguments])
-            }
-        }
-    })
-
-    static network = new Proxy(Apis, {
-        get(apis, method) {
-            return function() {
-                return apis.instance().network_api().exec(method,[...arguments])
-            }
-        }
-    })
-
-    static history = new Proxy(Apis, {
-        get(apis, method) {
-            return function() {
-                return apis.instance().history_api().exec(method,[...arguments])
-            }
-        }
-    })
-
-    static crypto = new Proxy(Apis, {
-        get(apis, method) {
-            return function() {
-                return apis.instance().crypto_api().exec(method,[...arguments])
-            }
-        }
-    })
-
-    static orders = new Proxy(Apis, {
-        get(apis, method) {
-            return function() {
-                return apis.instance().orders_api().exec(method,[...arguments])
-            }
-        }
-    })
-
-    /** @arg {string} connection .. */
-    connect( cs, connectTimeout, optionalApis = {enableCrypto: false, enableOrders: false} ) {
-        // console.log("INFO\tApiInstances\tconnect\t", cs);
-        this.url = cs;
-        let rpc_user = "", rpc_password = "";
-        if (typeof window !== "undefined" && window.location && window.location.protocol === "https:" && cs.indexOf("wss://") < 0) {
-            throw new Error("Secure domains require wss connection");
-        }
-
-        if( this.ws_rpc) {
-            this.ws_rpc.statusCb = null;
-            this.ws_rpc.keepAliveCb = null;
-            this.ws_rpc.on_close = null;
-            this.ws_rpc.on_reconnect = null;
-        }
-        this.ws_rpc = new ChainWebSocket(cs, this.statusCb, connectTimeout, autoReconnect, (closed)=>{
-            if(this._db && !closed) {
-                this._db.exec('get_objects', [['2.1.0']])
-                    .catch((e)=>{
-
-                    })
-            }
+    Apis.init_promise = Apis.ws_rpc
+      .login(rpc_user, rpc_password)
+      .then(() => {
+        //console.log("Connected to API node:", cs);
+        Apis._db = new GrapheneApi(Apis.ws_rpc, "database");
+        Apis._net = new GrapheneApi(Apis.ws_rpc, "network_broadcast");
+        Apis._hist = new GrapheneApi(Apis.ws_rpc, "history");
+        if (optionalApis.enableOrders)
+          Apis._orders = new GrapheneApi(Apis.ws_rpc, "orders");
+        if (optionalApis.enableCrypto)
+          Apis._crypt = new GrapheneApi(Apis.ws_rpc, "crypto");
+        var db_promise = Apis._db.init().then(() => {
+          //https://github.com/cryptonomex/graphene/wiki/chain-locked-tx
+          return Apis._db.exec("get_chain_id", []).then(_chain_id => {
+            Apis.chain_id = _chain_id;
+            return ChainConfig.setChainId(_chain_id);
+            //DEBUG console.log("chain_id1",this.chain_id)
+          });
         });
-
-        this.init_promise = this.ws_rpc.login(rpc_user, rpc_password).then(() => {
-            //console.log("Connected to API node:", cs);
-            this._db = new GrapheneApi(this.ws_rpc, "database");
-            this._net = new GrapheneApi(this.ws_rpc, "network_broadcast");
-            this._hist = new GrapheneApi(this.ws_rpc, "history");
-            if (optionalApis.enableOrders) this._orders = new GrapheneApi(this.ws_rpc, "orders");
-            if (optionalApis.enableCrypto) this._crypt = new GrapheneApi(this.ws_rpc, "crypto");
-            var db_promise = this._db.init().then( ()=> {
-                //https://github.com/cryptonomex/graphene/wiki/chain-locked-tx
-                return this._db.exec("get_chain_id",[]).then( _chain_id => {
-                    this.chain_id = _chain_id
-                    return ChainConfig.setChainId( _chain_id )
-                    //DEBUG console.log("chain_id1",this.chain_id)
-                });
+        Apis.ws_rpc.on_reconnect = () => {
+          if (!Apis.ws_rpc) return;
+          Apis.ws_rpc.login("", "").then(() => {
+            Apis._db.init().then(() => {
+              if (Apis.statusCb) Apis.statusCb("reconnect");
             });
-            this.ws_rpc.on_reconnect = () => {
-                if (!this.ws_rpc) return;
-                this.ws_rpc.login("", "").then(() => {
-                    this._db.init().then(() => {
-                        if(this.statusCb)
-                            this.statusCb("reconnect");
-                    });
-                    this._net.init();
-                    this._hist.init();
-                    if (optionalApis.enableOrders) this._orders.init();
-                    if (optionalApis.enableCrypto) this._crypt.init();
-                });
-            }
-            this.ws_rpc.on_close = () => {
-                this.close().then(() => {
-                    if (this.closeCb) this.closeCb();
-                })
-            }
-            let initPromises = [
-                db_promise,
-                this._net.init(),
-                this._hist.init(),
-            ];
-
-            if (optionalApis.enableOrders) initPromises.push(this._orders.init());
-            if (optionalApis.enableCrypto) initPromises.push(this._crypt.init());
-            return Promise.all(initPromises);
-        }).catch(err => {
-            console.error(cs, "Failed to initialize with error", err && err.message);
-            return this.close().then(() => {
-                throw err;
-            });
-        })
-    }
-
-    close() {
-        if (this.ws_rpc && this.ws_rpc.ws.readyState === 1) {
-            return this.ws_rpc.close()
-            .then(() => {
-                this.ws_rpc = null;
-            });
+            Apis._net.init();
+            Apis._hist.init();
+            if (optionalApis.enableOrders) Apis._orders.init();
+            if (optionalApis.enableCrypto) Apis._crypt.init();
+          });
         };
-        this.ws_rpc = null;
-        return Promise.resolve();
-    }
+        Apis.ws_rpc.on_close = () => {
+          Apis.close().then(() => {
+            if (Apis.closeCb) Apis.closeCb();
+          });
+        };
+        let initPromises = [db_promise, Apis._net.init(), Apis._hist.init()];
 
-    db_api () {
-        return this._db;
-    }
+        if (optionalApis.enableOrders) initPromises.push(Apis._orders.init());
+        if (optionalApis.enableCrypto) initPromises.push(Apis._crypt.init());
+        return Promise.all(initPromises);
+      })
+      .catch(err => {
+        console.error(
+          cs,
+          "Failed to initialize with error",
+          err && err.message
+        );
+        return Apis.close().then(() => {
+          throw err;
+        });
+      });
+  },
+  close: async () => {
+    if (Apis.ws_rpc && Apis.ws_rpc.ws.readyState === 1)
+      await Apis.ws_rpc.close();
 
-    network_api () {
-        return this._net;
-    }
-
-    history_api () {
-        return this._hist;
-    }
-
-    crypto_api () {
-        return this._crypt;
-    }
-
-    orders_api () {
-        return this._orders;
-    }
-
-    setRpcConnectionStatusCallback(callback) {
-        this.statusCb = callback;
-    }
-
-}
-
-export default Apis
+    Apis.ws_rpc = null;
+  },
+  db_api: () => Apis._db,
+  network_api: () => Apis._net,
+  history_api: () => Apis._hist,
+  crypto_api: () => Apis._crypt,
+  orders_api: () => Apis._orders,
+  setRpcConnectionStatusCallback: callback => (Apis.statusCb = callback)
+});

@@ -1,4 +1,4 @@
-import Apis from "./ApiInstances";
+import * as Apis from "./ApiInstances";
 import Manager from "./ConnectionManager";
 import ChainConfig from "./ChainConfig";
 

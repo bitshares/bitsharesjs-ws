@@ -4,7 +4,7 @@
       "@babel/preset-env",
       {
         "targets": {
-          "browsers": "> 1%",
+          "browsers": "> 5%",
           "node": "10"
         }
       }
