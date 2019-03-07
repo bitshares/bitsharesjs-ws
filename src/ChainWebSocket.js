@@ -147,7 +147,8 @@ class ChainWebSocket {
         "set_subscribe_callback",
         "subscribe_to_market",
         "broadcast_transaction_with_callback",
-        "set_pending_transaction_callback"
+        "set_pending_transaction_callback",
+        "set_block_applied_callback"
       ].includes(method)
     ) {
       // Store callback in subs map
