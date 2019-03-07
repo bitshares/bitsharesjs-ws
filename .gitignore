@@ -5,6 +5,3 @@ cjs
 es
 *.swp
 browser-test/browser-test.js
-build
-package-lock.json
-lib
