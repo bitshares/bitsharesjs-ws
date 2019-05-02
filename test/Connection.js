@@ -12,21 +12,6 @@ describe("Connection", () => {
         })
     });
 
-    // it("Connect to localhost", function() {
-    //     return new Promise( function(resolve) {
-    //         Apis.instance("ws://localhost:8090").init_promise.then(function (result) {
-    //             coreAsset = result[0].network.core_asset;
-    //
-    //             if (typeof coreAsset === "string") {
-    //                 resolve();
-    //             } else {
-    //                 reject(new Error("Expected coreAsset to be a string"));
-    //             }
-    //         });
-    //     });
-    // });
-
-
     it("Connect to Mainnet", function() {
         return new Promise( function(resolve, reject) {
             Apis.instance(default_api, true).init_promise.then(function (result) {
