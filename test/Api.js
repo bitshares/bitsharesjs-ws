@@ -300,36 +300,11 @@ describe("Api", () => {
 
     });
 
-    describe("Crypto API", function() {
-
-        // Connect once for all tests
-        before(function() {
-            return Apis.instance("wss://bitshares.openledger.info/ws", true, 5000, {enableCrypto: true}).init_promise.then(function (result) {
-                coreAsset = result[0].network.core_asset;
-            });
-        });
-
-        after(function() {
-            return new Promise(function(res) {
-                Apis.close().then(res);
-            })
-        });
-
-        it("Initializes the crypto api", function() {
-            assert(!!Apis.instance().crypto_api());
-        })
-
-        it("Initializes the crypto api (short)", function() {
-            assert(!!Apis.crypto);
-        })
-
-    });
-
     describe("Orders API", function() {
 
         // Connect once for all tests
         before(function() {
-            return Apis.instance("wss://bitshares.openledger.info/ws", true, 5000, {enableOrders: true}).init_promise.then(function (result) {
+            return Apis.instance(cs, true, 5000, {enableOrders: true}).init_promise.then(function (result) {
                 coreAsset = result[0].network.core_asset;
             });
         });

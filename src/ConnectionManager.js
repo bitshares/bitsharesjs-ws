@@ -123,7 +123,6 @@ class Manager {
 
         return result;
       } catch (err) {
-        this.logFailure("checkConnections", url, err);
         if (url === this.url) {
           this.url = this.urls[0];
         } else {

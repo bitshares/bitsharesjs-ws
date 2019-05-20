@@ -2,7 +2,7 @@ import ChainWebSocket from "./ChainWebSocket";
 import GrapheneApi from "./GrapheneApi";
 import ChainConfig from "./ChainConfig";
 
-let autoReconnect = false; // by default don't use reconnecting-websocket
+var autoReconnect = false; // by default don't use reconnecting-websocket
 
 var Apis = null;
 var statusCb = null;

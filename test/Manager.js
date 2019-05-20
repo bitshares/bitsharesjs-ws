@@ -71,18 +71,8 @@ describe("Connection Manager", function() {
         assert.equal(man.url, defaultUrl);
     });
 
-    it("Instantiates with crypto api", function() {
-        let man = new Manager({url: "wss://eu.nodes.bitshares.ws", urls: [], optionalApis: {enableCrypto: true}});
-        return new Promise( function(resolve, reject) {
-            man.connect().then(() => {
-                assert(!!Apis.instance().crypto_api());
-                resolve();
-            })
-        });
-    });
-
     it("Instantiates with orders api", function() {
-        let man = new Manager({url: "wss://eu.nodes.bitshares.ws", urls: [], optionalApis: {enableCrypto: true, enableOrders: true}});
+        let man = new Manager({url: "wss://eu.nodes.bitshares.ws", urls: [], optionalApis: {enableOrders: true}});
         return new Promise( function(resolve, reject) {
             man.connect().then(() => {
                 assert(!!Apis.instance().orders_api());
