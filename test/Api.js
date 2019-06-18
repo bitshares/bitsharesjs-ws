@@ -2,7 +2,7 @@ import assert from "assert";
 import {Apis} from "../lib";
 
 var coreAsset;
-var default_api = "wss://eu.openledger.info/ws";
+var default_api = "wss://eu.nodes.bitshares.ws";
 
 describe("Api", () => {
 
@@ -22,36 +22,36 @@ describe("Api", () => {
         });
 
         it("Set subscribe callback", function() {
-            return new Promise( function(resolve) {
+            this.timeout(10000);
+            return new Promise( function(resolve, reject) {
                 Apis.instance().db_api().exec( "set_subscribe_callback", [ callback, true ] ).then(function(sub) {
                     if (sub === null) {
                         resolve();
                     } else {
                         reject(new Error("Expected sub to equal null"));
                     }
-                })
+                });
 
-                function callback(obj) {
-                    console.log("callback obj:", obj);
+                function callback() {
                     resolve()
                 }
             })
         });
 
         it("Market subscription", function() {
-            return new Promise( function(resolve) {
+            this.timeout(10000);
+            return new Promise( function(resolve, reject) {
                 Apis.instance().db_api().exec( "subscribe_to_market", [
-                    callback, "1.3.0", "1.3.19"
+                    callback, "1.3.0", "1.3.113"
                 ] ).then(function(sub) {
                     if (sub === null) {
                         resolve();
                     } else {
                         reject(new Error("Expected sub to equal null"));
                     }
-                })
-
+                });
                 function callback() {
-                    resolve()
+                    resolve();
                 }
             })
         })
@@ -60,11 +60,11 @@ describe("Api", () => {
             this.timeout(10000);
             return new Promise( function(resolve) {
                 Apis.instance().db_api().exec( "subscribe_to_market", [
-                    callback, "1.3.0", "1.3.19"
+                    callback, "1.3.0", "1.3.113"
                 ] ).then(function() {
 
                     Apis.instance().db_api().exec("unsubscribe_from_market", [
-                        callback, "1.3.0", "1.3.19"
+                        callback, "1.3.0", "1.3.113"
                     ]).then(function(unsub) {
                         if (unsub === null) {
                             resolve();
@@ -297,31 +297,6 @@ describe("Api", () => {
                 })
             })
         });
-
-    });
-
-    describe("Crypto API", function() {
-
-        // Connect once for all tests
-        before(function() {
-            return Apis.instance(cs, true, 5000, {enableCrypto: true}).init_promise.then(function (result) {
-                coreAsset = result[0].network.core_asset;
-            });
-        });
-
-        after(function() {
-            return new Promise(function(res) {
-                Apis.close().then(res);
-            })
-        });
-
-        it("Initializes the crypto api", function() {
-            assert(!!Apis.instance().crypto_api());
-        })
-
-        it("Initializes the crypto api (short)", function() {
-            assert(!!Apis.crypto);
-        })
 
     });
 
