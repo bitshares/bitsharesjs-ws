@@ -33,7 +33,7 @@ For use in a webpack/browserify context, see the example below for how to open a
 var {Apis} = require("bitsharesjs-ws");
 Apis.instance("wss://bitshares.openledger.info/ws", true).init_promise.then((res) => {
     console.log("connected to:", res[0].network);
-    Apis.instance().db_api().exec( "set_subscribe_callback", [ updateListener, true ] )
+    Apis.db.set_subscribe_callback( updateListener, true )
 });
 
 function updateListener(object) {
@@ -49,8 +49,7 @@ This is a non-exhaustive list of endpoints available from the witness_node execu
 https://github.com/bitshares/bitshares-core/blob/master/libraries/app/database_api.cpp
 
 __Usage examples__
-`Apis.instance().db_api().exec(method, params)`
-`Apis.instance().db_api().exec("get_objects, [["1.3.0", "2.0.0", "2.1.0"]])`
+`Apis.db.get_objects(["1.3.0", "2.0.0", "2.1.0"])`
 
 ### Objects
 | Method Name                 | Params      |
