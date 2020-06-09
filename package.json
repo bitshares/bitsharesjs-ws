@@ -19,7 +19,8 @@
     "postbuild": "npm run browserify",
     "prepublish": "npm run build",
     "browserify": "cross-env NODE_ENV=production browserify lib/index.js --standalone bitshares_ws -o build/bitsharesjs-ws.js -d",
-    "postbrowserify": "cross-env NODE_ENV=production minify build/bitsharesjs-ws.js --mangle --outFile build/bitsharesjs-ws.min.js"
+    "postbrowserify": "cross-env NODE_ENV=production minify build/bitsharesjs-ws.js --mangle --outFile build/bitsharesjs-ws.min.js",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
