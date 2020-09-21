@@ -9,8 +9,7 @@ var faultyNodeList = [
     {url: "wss://bitshaazdzares.openledger.info/ws", location: "Nuremberg, Germany"},
     {url: "wss://bit.btzadazdsabc.org/ws", location: "Hong Kong"},
     {url: "ws://127.0.0.1:8091", location: "Hangzhou, China"},
-    {url: "wss://bitshares.openledger.info/ws", location: "Nuremberg, Germany"},
-    {url: "wss://secure.freedomledger.com/ws", location: "Toronto, Canada"},
+    {url: "wss://eu.nodes.bitshares.ws", location: "Nuremberg, Germany"},
     {url: "wss://node.testnet.bitshares.eu", location: "Public Testnet Server (Frankfurt, Germany)"}
 ];
 
@@ -23,16 +22,6 @@ var noWorkingNodes = [
     {url: "wss://bitshasdares.dacplay.org:8089/ws", location:  "Hangzhou, China"},
     {url: "wss://secuasdre.freedomledger.com/ws", location: "Toronto, Canada"},
     {url: "wss://testnet.bitshares.eu/wqsdsqs", location: "Public Testnet Server (Frankfurt, Germany)"}
-];
-
-var goodNodeList = [
-    {url: "wss://bitshares.openledger.info/ws", location: "Nuremberg, Germany"},
-    {url: "wss://bit.btsabc.org/ws", location: "Hong Kong"},
-    {url: "wss://bts.transwiser.com/ws", location: "Hangzhou, China"},
-    {url: "wss://bitshares.dacplay.org:8089/ws", location:  "Hangzhou, China"},
-    {url: "wss://openledger.hk/ws", location: "Hong Kong"},
-    {url: "wss://secure.freedomledger.com/ws", location: "Toronto, Canada"},
-    {url: "wss://node.testnet.bitshares.eu", location: "Public Testnet Server (Frankfurt, Germany)"}
 ];
 
 var fullNodeList = [
@@ -95,7 +84,7 @@ describe("Connection Manager", function() {
         let man = new Manager({url: "ws://127.0.0.1:8092", urls: faultyNodeList.map(a => a.url)});
         return new Promise( function(resolve, reject) {
             man.connectWithFallback().then(function() {
-                assert.equal(man.url, "wss://bitshares.openledger.info/ws");
+                assert.equal(man.url, "wss://eu.nodes.bitshares.ws");
                 resolve();
             })
             .catch(reject)
@@ -134,7 +123,7 @@ describe("Connection Manager", function() {
             url: "wss://eu.nodes.bitshares.ws",
             urls: ([
                 "wss://eu.nodes.bitshares.ws",
-                "wss://bitshares.openledger.info/ws"
+                "wss://public.xbts.io/ws"
             ]),
             autoFallback: true
         });
