@@ -6,3 +6,5 @@ cjs
 es
 *.swp
 browser-test/browser-test.js
+lib/
+build/
