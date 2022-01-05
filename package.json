@@ -1,6 +1,6 @@
 {
   "name": "bitsharesjs-ws",
-  "version": "4.0.0",
+  "version": "6.0.0-rc1",
   "description": "Pure JavaScript BitShares websocket interface for node.js and browsers.",
   "browser": {
     "ws": false
