@@ -1,8 +1,9 @@
 import assert from "assert";
-import {Apis} from "../lib";
+import {Apis} from "../src";
 
 var coreAsset;
-var default_api = "wss://eu.nodes.bitshares.ws";
+var default_mainnet_api = "wss://eu.nodes.bitshares.ws";
+var default_testnet_api = "wss://eu.nodes.testnet.bitshares.ws";
 
 describe("Connection", () => {
 
@@ -14,7 +15,7 @@ describe("Connection", () => {
 
     it("Connect to Mainnet", function() {
         return new Promise( function(resolve, reject) {
-            Apis.instance(default_api, true).init_promise.then(function (result) {
+            Apis.instance(default_mainnet_api, true).init_promise.then(function (result) {
                 coreAsset = result[0].network.core_asset;
                 assert(coreAsset === "BTS");
                 resolve();
@@ -24,7 +25,7 @@ describe("Connection", () => {
 
     it("Connect to Testnet", function() {
         return new Promise( function(resolve, reject) {
-            Apis.instance("wss://node.testnet.bitshares.eu", true).init_promise.then(function (result) {
+            Apis.instance(default_testnet_api, true).init_promise.then(function (result) {
                 coreAsset = result[0].network.core_asset;
                 assert(coreAsset === "TEST");
                 resolve();
@@ -35,7 +36,7 @@ describe("Connection", () => {
     it("Times out properly", function() {
         return new Promise( function(resolve, reject) {
             /* 1ms connection timeout */
-            Apis.instance(default_api, true, 1).init_promise.then(function() {
+            Apis.instance(default_mainnet_api, true, 1).init_promise.then(function() {
                 reject();
             }).catch(function(err) {
                 assert(err.message.search("Connection attempt timed out") !== -1);
@@ -46,7 +47,7 @@ describe("Connection", () => {
 
     it("Can be closed", function() {
         return new Promise( function(resolve, reject) {
-            Apis.instance(default_api, true).init_promise.then(function (result) {
+            Apis.instance(default_mainnet_api, true).init_promise.then(function (result) {
                 coreAsset = result[0].network.core_asset;
                 assert(coreAsset === "BTS");
                 Apis.instance().close().then(function() {
@@ -66,10 +67,10 @@ describe("Connection reset", () => {
 
     it("Resets between chains", function() {
         return new Promise( function(resolve, reject) {
-            Apis.instance(default_api, true).init_promise.then(function (result) {
+            Apis.instance(default_mainnet_api, true).init_promise.then(function (result) {
                 coreAsset = result[0].network.core_asset;
                 assert(coreAsset === "BTS");
-                Apis.reset("wss://node.testnet.bitshares.eu", true).then(instance => {
+                Apis.reset(default_testnet_api, true).then(instance => {
                     instance.init_promise.then(function (result) {
                         coreAsset = result[0].network.core_asset;
                         assert(coreAsset === "TEST");
