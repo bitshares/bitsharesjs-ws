@@ -39,15 +39,15 @@ var config = {
   },
 
   reset: () => {
-    config.core_asset = "CORE";
-    config.address_prefix = "GPH";
+    config.core_asset = "ABC";
+    config.address_prefix = "CBA";
     config.expire_in_secs = 15;
     config.expire_in_secs_proposal = 24 * 60 * 60;
 
     console.log("Chain config reset");
   },
 
-  setPrefix: (prefix = "GPH") => (config.address_prefix = prefix)
+  setPrefix: (prefix = "CBA") => (config.address_prefix = prefix)
 };
 
 export default config;
