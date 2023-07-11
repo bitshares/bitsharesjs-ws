@@ -1,6 +1,6 @@
 {
   "name": "bitsharesjs-ws",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "description": "Pure JavaScript BitShares websocket interface for node.js and browsers.",
   "browser": {
     "ws": false
@@ -52,7 +52,7 @@
     "@babel/preset-env": "^7.16.5",
     "@babel/register": "^7.16.5",
     "assert": "^2.0.0",
-    "babel-minify": "^0.5.1",
+    "babel-minify": "^0.5.2",
     "babel-preset-minify": "^0.5.1",
     "browserify": "^17.0.0",
     "cross-env": "^7.0.3",
