@@ -46,18 +46,18 @@ The `set_subscribe_callback` callback (updateListener) will be called whenever a
 This is a non-exhaustive list of endpoints available from the witness_node executable, which provides the API server of Bitshares.
 
 ## Public API 
-Please see all available methods in the [official documentation](http://dev.bitshares.works/en/master/api/blockchain_api.html).
+Please see all available methods in the [official documentation](http://docs.bitshares.dev/en/master/api/blockchain_api.html).
 
 ### Database API
 
-To access the [Database API](http://dev.bitshares.works/en/master/api/blockchain_api/database.html), you can use the `Apis.db` object.
+To access the [Database API](http://docs.bitshares.dev/en/master/api/blockchain_api/database.html), you can use the `Apis.db` object.
 
 __Usage example__
 `Apis.db.get_objects(["1.3.0", "2.0.0", "2.1.0"])`
 
 ### History API
 
-To access the [Account History API](http://dev.bitshares.works/en/master/api/blockchain_api/history.html), you can use the `Apis.history` object.
+To access the [Account History API](http://docs.bitshares.dev/en/master/api/blockchain_api/history.html), you can use the `Apis.history` object.
 
 __Usage example__
 `Apis.history.get_account_history("1.2.849826", "1.11.0", 10, "1.11.0")`
